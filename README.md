@@ -22,11 +22,11 @@ In this example we simply look for one of the following names in the file and pe
 | warn.png             | File will be accepted and a warning with names of the offending files |
 | accept.png           | File will be accepted and no message displayed                        |
 
-![Blocked](ui-blocked.png "Blocked file")
-![Flex Blocked](flex-blocked.png "Flex blocked")
-![Warn](ui-warn.png "Warning")
-![OK](ui-ok.png "Accepted")
-![Flex Ok](flex-ok.png "Flex Accepted")
+![Blocked](screenshots/ui-blocked.png "Blocked file")
+![Flex Blocked](screenshots/flex-blocked.png "Flex blocked")
+![Warn](screenshots/ui-warn.png "Warning")
+![OK](screenshots/ui-ok.png "Accepted")
+![Flex Ok](screenshots/flex-ok.png "Flex Accepted")
 
 ## Configuration
 
