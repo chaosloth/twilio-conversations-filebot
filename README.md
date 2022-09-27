@@ -52,4 +52,4 @@ In the Twilio console, select the Conversations > Manage > Services and choose t
 - Select the "onConversationAdd" hook
 - Save the configuration
 
-![Hooks](webhooks.png "Hooks")
+![Hooks](screenshots/webhooks.png "Hooks")
