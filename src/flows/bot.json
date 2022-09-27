@@ -1,0 +1,263 @@
+{
+  "description": "A New Flow",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "next": "First_Message",
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 20,
+          "y": -260
+        }
+      }
+    },
+    {
+      "name": "send_and_reply_welcome",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "split_1",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "no_reply_timeout_msg",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 180,
+          "y": 320
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Do you want to chat with someone?",
+        "timeout": "30"
+      }
+    },
+    {
+      "name": "send_message_bye",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -510,
+          "y": 1020
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "No worries, message if you need us"
+      }
+    },
+    {
+      "name": "no_reply_timeout_msg",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 290,
+          "y": 610
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "No reponse in timeout, ending conversation"
+      }
+    },
+    {
+      "name": "split_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "send_message_bye",
+          "event": "noMatch"
+        },
+        {
+          "next": "send_to_human",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of yes, Yes, yep, Y",
+              "arguments": ["{{widgets.send_and_reply_welcome.inbound.Body}}"],
+              "type": "matches_any_of",
+              "value": "yes, Yes, yep, Y"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.send_and_reply_welcome.inbound.Body}}",
+        "offset": {
+          "x": -170,
+          "y": 610
+        }
+      }
+    },
+    {
+      "name": "send_to_human",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "send_to_flex_1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 120,
+          "y": 1020
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Let me find a human to help"
+      }
+    },
+    {
+      "name": "send_to_flex_1",
+      "type": "send-to-flex",
+      "transitions": [
+        {
+          "event": "callComplete"
+        },
+        {
+          "event": "failedToEnqueue"
+        },
+        {
+          "event": "callFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 10,
+          "y": 1340
+        },
+        "workflow": "WW0f7b84eff9b98e295937a242cd32b12b",
+        "channel": "TC3ac9afe6283142a056ee0e4de8f620d2"
+      }
+    },
+    {
+      "name": "First_Message",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "send_and_reply_welcome",
+          "event": "noMatch"
+        },
+        {
+          "next": "Sending_to_dispatch",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "Dispatch",
+              "arguments": ["{{trigger.conversation.Body}}"],
+              "type": "contains",
+              "value": "Dispatch"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{trigger.conversation.Body}}",
+        "offset": {
+          "x": 420,
+          "y": -40
+        }
+      }
+    },
+    {
+      "name": "Sending_to_dispatch",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "send_to_flex_dispatch",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 700,
+          "y": 370
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Let me find someone in dispatch to help"
+      }
+    },
+    {
+      "name": "send_to_flex_dispatch",
+      "type": "send-to-flex",
+      "transitions": [
+        {
+          "event": "callComplete"
+        },
+        {
+          "event": "failedToEnqueue"
+        },
+        {
+          "event": "callFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 780,
+          "y": 840
+        },
+        "workflow": "WW0f7b84eff9b98e295937a242cd32b12b",
+        "channel": "TC3ac9afe6283142a056ee0e4de8f620d2"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
